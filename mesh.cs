@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -16,12 +17,18 @@ namespace Template
 		int vertexBufferId;                     // vertex buffer
 		int triangleBufferId;                   // triangle buffer
 		int quadBufferId;                       // quad buffer
-
+		public Matrix4 ModelMatrix;      // model matrix
+		public Shader Shader;
+		public Texture Texture;
+		public List<Mesh> Children = new List<Mesh>();
 		// constructor
-		public Mesh( string fileName )
+		public Mesh( string fileName, Matrix4 modelmatrix, Shader shader, Texture texture )
 		{
 			MeshLoader loader = new MeshLoader();
 			loader.Load( this, fileName );
+			ModelMatrix = modelmatrix;
+			Shader = shader;
+			Texture = texture;
 		}
 
 		// initialization; called during first render
@@ -96,6 +103,18 @@ namespace Template
 			// restore previous OpenGL state
 			GL.UseProgram( 0 );
 			GL.PopClientAttrib();
+		}
+
+		public void RenderChildren(Mesh parent, Matrix4 camera, Matrix4 viewport)
+        {
+			foreach (Mesh child in Children)
+			{
+
+				child.Render(child.Shader, parent.ModelMatrix * child.ModelMatrix * camera * viewport, child.Texture);
+
+				if (child.Children.Count > 0)
+					child.RenderChildren(child, camera, viewport);
+			}
 		}
 
 		// layout of a single vertex
