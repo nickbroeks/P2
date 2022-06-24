@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 namespace Template
@@ -12,6 +13,7 @@ namespace Template
 		public int attribute_vnrm;
 		public int attribute_vuvs;
 		public int uniform_mview;
+		public int uniform_amblight;
 
 		// constructor
 		public Shader( String vertexShader, String fragmentShader )

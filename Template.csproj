@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Light.cs" />
     <Compile Include="mesh.cs" />
     <Compile Include="meshLoader.cs" />
     <Compile Include="MyApplication.cs" />
@@ -60,6 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="assets\floor.obj" />
+    <None Include="assets\teapot.obj" />
     <None Include="shaders\fs.glsl" />
     <None Include="shaders\fs_post.glsl" />
     <None Include="shaders\vs.glsl" />
@@ -69,6 +72,10 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\font.png" />
+    <Content Include="assets\wood.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

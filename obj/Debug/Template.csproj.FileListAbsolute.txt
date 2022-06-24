@@ -1,0 +1,11 @@
+A:\Uni\Graphics\Assignments\P2\P2\bin\Debug\INFOGR2019Tmpl8.exe.config
+A:\Uni\Graphics\Assignments\P2\P2\bin\Debug\INFOGR2019Tmpl8.exe
+A:\Uni\Graphics\Assignments\P2\P2\bin\Debug\INFOGR2019Tmpl8.pdb
+A:\Uni\Graphics\Assignments\P2\P2\bin\Debug\OpenTK.dll
+A:\Uni\Graphics\Assignments\P2\P2\bin\Debug\OpenTK.pdb
+A:\Uni\Graphics\Assignments\P2\P2\bin\Debug\OpenTK.xml
+A:\Uni\Graphics\Assignments\P2\P2\obj\Debug\Template.csproj.AssemblyReference.cache
+A:\Uni\Graphics\Assignments\P2\P2\obj\Debug\Template.csproj.CoreCompileInputs.cache
+A:\Uni\Graphics\Assignments\P2\P2\obj\Debug\Template.csproj.CopyComplete
+A:\Uni\Graphics\Assignments\P2\P2\obj\Debug\INFOGR2019Tmpl8.exe
+A:\Uni\Graphics\Assignments\P2\P2\obj\Debug\INFOGR2019Tmpl8.pdb
