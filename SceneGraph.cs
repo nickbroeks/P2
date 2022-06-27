@@ -13,11 +13,11 @@ namespace Template
         public List<Mesh> meshes = new List<Mesh>();
         Matrix4 ViewPort = Matrix4.CreatePerspectiveFieldOfView(1.2f, 1.3f, .1f, 1000);
         public SceneGraph() { }
-        public void Render(Matrix4 camera)
+        public void Render(Shader shader, Matrix4 camera)
         {
             foreach(Mesh mesh in meshes)
             {
-                mesh.Render(mesh.Shader, mesh.ModelMatrix * camera * ViewPort, mesh.Texture);
+                mesh.Render(shader, mesh.ModelMatrix * camera * ViewPort, mesh.Texture);
             }
         }
     }

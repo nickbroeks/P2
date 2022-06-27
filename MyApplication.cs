@@ -11,7 +11,6 @@ namespace Template
 	{
 		// member variables
 		public Surface screen;                  // background surface for printing etc.
-		Mesh teapot, floor;                       // a mesh to draw using OpenGL
 		const float PI = 3.1415926535f;         // PI
 		float a = 0;                            // teapot rotation angle
 		Stopwatch timer;                        // timer for measuring frame duration
@@ -20,6 +19,7 @@ namespace Template
 		Texture wood, white;                           // texture to use for rendering
 		RenderTarget target;                    // intermediate render target
 		ScreenQuad quad;                        // screen filling quad for post processing
+		Mesh plane, teapot;
 		bool useRenderTarget = true;
 		public int uniform_amblight;
 		public int uniform_camposition;
@@ -46,9 +46,11 @@ namespace Template
 			postproc = new Shader("../../shaders/vs_post.glsl", "../../shaders/fs_post.glsl");
 			white = new Texture("../../assets/white.jpg");
 			// load teapot
-			teapot = new Mesh( "../../assets/teapot.obj", Matrix4.CreateScale(0.5f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a ), shader,wood);
-			floor = new Mesh( "../../assets/floor.obj", Matrix4.CreateScale(4.0f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a), shader, wood );
-			sceneGraph.meshes.Add(teapot);
+			teapot = new Mesh( "../../assets/teapot.obj", Matrix4.CreateTranslation(0, 0, 0) * Matrix4.CreateScale(0.2f), shader, white);
+			Mesh floor = new Mesh( "../../assets/floor.obj", Matrix4.CreateScale(4.0f), shader, wood );
+			plane = new Mesh("../../assets/paper_airplane.obj", Matrix4.CreateScale(2f) * Matrix4.CreateTranslation(0.3f, 0.1f, 0), shader, white);
+			teapot.Children.Add(plane);
+			floor.Children.Add(teapot);
 			sceneGraph.meshes.Add(floor);
 
 			// initialize stopwatch
@@ -66,23 +68,26 @@ namespace Template
 			GL.UseProgram(shader.programID);
 			GL.Uniform4(uniform_amblight, ambientLight);
 			GL.Uniform3(uniform_camposition, ref cameraPosition);
-
-			GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ssbo_lights);
-			GL.BufferData(BufferTarget.ShaderStorageBuffer, (IntPtr)(lights.Length * Marshal.SizeOf(typeof(Light))), lights, BufferUsageHint.StaticDraw );
-			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, ssbo_lights);
-			GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-
-			float angle90degrees = PI / 2;
-			Tcamera = Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a)
-				* Matrix4.CreateTranslation(new Vector3(0, -4f, -10f));
+			LoadLights();
+			Tcamera = Matrix4.CreateTranslation(new Vector3(0, -4f, -10f));
 		}
 
+		public void LoadLights()
+        {
+			GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ssbo_lights);
+			GL.BufferData(BufferTarget.ShaderStorageBuffer, (IntPtr)(lights.Length * Marshal.SizeOf(typeof(Light))), lights, BufferUsageHint.StaticDraw);
+			GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, ssbo_lights);
+			GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+		}
 		// tick for background surface
 		public void Tick()
 		{
 			screen.Clear( 0 );
 			screen.Print( "hello world", 2, 2, 0xffff00 );
 			HandleInput(Keyboard.GetState());
+			a += 0.02f;
+			teapot.ModelMatrix = Matrix4.CreateTranslation(0, 5*(float)Math.Sin(5*a), 0) * Matrix4.CreateScale(0.2f);
+			plane.ModelMatrix = Matrix4.CreateScale(200f) * Matrix4.CreateTranslation(20f, 10f, 0) * Matrix4.CreateRotationY(a);
 		}
 		/// <summary>
 		/// Method that gets the input values and passes the used values to the raytracer
@@ -118,19 +123,8 @@ namespace Template
 		public void RenderGL()
 		{
 			// measure frame duration
-			float frameDuration = timer.ElapsedMilliseconds;
 			timer.Reset();
 			timer.Start();
-
-			cameraPosition = 10 * new Vector3(-(float)Math.Sin(a),1f, (float)-Math.Cos(a));
-
-			// prepare matrix for vertex shader
-			
-			Matrix4 Tpot = Matrix4.CreateScale( 0.5f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), 0 );
-			Matrix4 Tfloor = Matrix4.CreateScale( 4.0f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), 0 );
-			//Matrix4 Tcamera = Matrix4.CreateTranslation( new Vector3( 0, -14.5f, 0 ) ) * Matrix4.CreateFromAxisAngle( new Vector3( 1, 0, 0 ), angle90degrees );
-			
-			Matrix4 Tview = Matrix4.CreatePerspectiveFieldOfView( 1.2f, 1.3f, .1f, 1000 );
 
 
 			if( useRenderTarget )
@@ -139,7 +133,7 @@ namespace Template
 				target.Bind();
 
 				// render scene to render target
-				sceneGraph.Render(Tcamera);
+				sceneGraph.Render(shader, Tcamera);
 				// render quad
 				target.Unbind();
 				quad.Render( postproc, target.GetTextureID() );
@@ -147,7 +141,7 @@ namespace Template
 			else
 			{
 				// render scene directly to the screen
-				sceneGraph.Render(Tcamera);
+				sceneGraph.Render(shader, Tcamera);
 			}
 		}
 	}

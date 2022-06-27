@@ -18,7 +18,6 @@ namespace Template
 		int triangleBufferId;                   // triangle buffer
 		int quadBufferId;                       // quad buffer
 		public Matrix4 ModelMatrix;      // model matrix
-		public Shader Shader;
 		public Texture Texture;
 		public List<Mesh> Children = new List<Mesh>();
 		// constructor
@@ -27,7 +26,6 @@ namespace Template
 			MeshLoader loader = new MeshLoader();
 			loader.Load( this, fileName );
 			ModelMatrix = modelmatrix;
-			Shader = shader;
 			Texture = texture;
 		}
 
@@ -58,7 +56,8 @@ namespace Template
 		{
 			// on first run, prepare buffers
 			Prepare( shader );
-
+			if (Children.Count > 0)
+				RenderChildren(shader, transform);
 			// safety dance
 			GL.PushClientAttrib( ClientAttribMask.ClientVertexArrayBit );
 
@@ -105,15 +104,11 @@ namespace Template
 			GL.PopClientAttrib();
 		}
 
-		public void RenderChildren(Mesh parent, Matrix4 camera, Matrix4 viewport)
+		public void RenderChildren(Shader shader, Matrix4 transform)
         {
 			foreach (Mesh child in Children)
 			{
-
-				child.Render(child.Shader, parent.ModelMatrix * child.ModelMatrix * camera * viewport, child.Texture);
-
-				if (child.Children.Count > 0)
-					child.RenderChildren(child, camera, viewport);
+				child.Render(shader, child.ModelMatrix * transform, child.Texture);
 			}
 		}
 
